@@ -6,7 +6,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import Imputer
 from sklearn.ensemble import RandomForestClassifier
 import pandas as pd
-from pipeline import Getdummies, Logarize, DatetoYear, SelectColumns, ReplaceNaN, Square, Interactify, Multiplarify
+from pipeline import GetDummies, BuildVariables, Logarize, DatetoYear, SelectColumns, ReplaceNaN, Squarify, Interactify, Multiplarify
 
 # Read files
 X = pd.read_csv('data/application_train.csv')
@@ -16,10 +16,11 @@ y = X['TARGET']
 # Build pipeline
 p = Pipeline([
     ('fillna',ReplaceNaN()),
-    ('getdummies',Getdummies()),
+    ('get_dummies',GetDummies()),
+    ('build_variables', BuildVariables()),
     ('log',Logarize()),
     ('datetoyear',DatetoYear()),
-    ('square', Square()),
+    ('squares', Squarify()),
     ('multiples', Multiplarify()),
     ('interactions', Interactify()),
     ('select',SelectColumns()),
@@ -30,7 +31,7 @@ p = Pipeline([
 X = X.reset_index()
 X = X.drop(['TARGET'], axis = 1)
 
-params = {'rf__n_estimators':[100, 500], 'rf__max_depth':[5,8], 'rf__max_features': [5,6]}
+params = {'rf__n_estimators':[500], 'rf__max_depth':[8], 'rf__max_features': [6,10]}
 gscv = GridSearchCV(p, params,
                     cv=3,
                     scoring = 'roc_auc',
@@ -46,7 +47,7 @@ print('Best AUC: {}'.format(clf.best_score_))
 submit = X_test[['SK_ID_CURR']]
 submit['TARGET'] = probabilities[:, 1]
 # submit.head()
-submit.to_csv('balls_solutions.csv', index = False)
+submit.to_csv('RF_07-01-2018.csv', index = False)
 
 
 # Code to debug individual pipeline classes
