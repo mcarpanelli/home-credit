@@ -24,17 +24,26 @@ housing = ['NAME_HOUSING_TYPE_Municipal apartment',
 
 suite = ['NAME_TYPE_SUITE_Family', 'NAME_TYPE_SUITE_Group of people',
        'NAME_TYPE_SUITE_Other_A', 'NAME_TYPE_SUITE_Other_B',
-       'NAME_TYPE_SUITE_Spouse, partner']
+       'NAME_TYPE_SUITE_Spouse, partner', 'NAME_TYPE_SUITE_Unaccompanied']
 
 contract = ['NAME_CONTRACT_TYPE_Revolving loans']
 
 gender = ['CODE_GENDER_M']
 
-occupation = ['OCCUPATION_TYPE_Waiters/barmen staff']
+occupation = ['OCCUPATION_TYPE_Cleaning staff', 'OCCUPATION_TYPE_Cooking staff',
+            'OCCUPATION_TYPE_Core staff', 'OCCUPATION_TYPE_Drivers',
+            'OCCUPATION_TYPE_HR staff', 'OCCUPATION_TYPE_High skill tech staff',
+            'OCCUPATION_TYPE_IT staff', 'OCCUPATION_TYPE_Laborers',
+            'OCCUPATION_TYPE_Low-skill Laborers', 'OCCUPATION_TYPE_Managers',
+            'OCCUPATION_TYPE_Medicine staff',
+            'OCCUPATION_TYPE_Private service staff',
+            'OCCUPATION_TYPE_Realty agents', 'OCCUPATION_TYPE_Sales staff',
+            'OCCUPATION_TYPE_Secretaries', 'OCCUPATION_TYPE_Security staff',
+            'OCCUPATION_TYPE_Waiters/barmen staff']
 
 income_type = ['NAME_INCOME_TYPE_Commercial associate', 'NAME_INCOME_TYPE_Pensioner',
        'NAME_INCOME_TYPE_State servant', 'NAME_INCOME_TYPE_Student',
-       'NAME_INCOME_TYPE_Unemployed', 'OCCUPATION_TYPE_Realty agents']
+       'NAME_INCOME_TYPE_Unemployed', 'NAME_INCOME_TYPE_Working']
 
 selected_for_dummies = {
     'CODE_GENDER': gender,
@@ -72,13 +81,10 @@ class ReplaceNaN(BaseEstimator, TransformerMixin):
         for col_name, value in zip(self.num_col_name, num_median):
             self.dict[col_name] = value
 
-        # print(self.dict)
         return self
 
     def transform(self, X):
-        # print(X.columns)
         X.fillna(value=self.dict, inplace=True)
-        # print(X.columns)
         return X
 
 class GetDummies(BaseEstimator, TransformerMixin):
@@ -118,10 +124,6 @@ class BuildVariables(BaseEstimator, TransformerMixin):
     def transform(self,X):
         for i, j in zip(self.columns_to_input, self.columns_new_names):
             X[j] = X[i]!=365243*1
-            # if X[i]!=365243*1:
-            #     X[j] = 1
-            # else:
-            #     X[j] = 0
         return X
 
 class Logarize(BaseEstimator, TransformerMixin):

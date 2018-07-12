@@ -4,7 +4,7 @@ from sklearn.metrics import make_scorer
 from sklearn.model_selection import PredefinedSplit, GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import Imputer
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 import pandas as pd
 from pipeline import GetDummies, BuildVariables, Logarize, DatetoYear, SelectColumns, ReplaceNaN, Squarify, Interactify, Multiplarify
 
@@ -23,15 +23,18 @@ p = Pipeline([
     ('squares', Squarify()),
     ('multiples', Multiplarify()),
     ('interactions', Interactify()),
-    ('select',SelectColumns()),
-    ('rf', RandomForestClassifier())
+    ('select', SelectColumns()),
+    ('gb', GradientBoostingClassifier())
+    # ('rf', RandomForestClassifier())
 ])
 
 # Run model(s)
 X = X.reset_index()
 X = X.drop(['TARGET'], axis = 1)
 
-params = {'rf__n_estimators':[500], 'rf__max_depth':[8], 'rf__max_features': [6,10]}
+# params = {'rf__n_estimators':[500], 'rf__max_depth':[8], 'rf__max_features': [6,10]}
+params = {'gb__n_estimators':[500], 'gb__max_depth':[3], 'gb__learning_rate': [0.1]}
+
 gscv = GridSearchCV(p, params,
                     cv=3,
                     scoring = 'roc_auc',
@@ -42,12 +45,13 @@ probabilities = clf.predict_proba(X_test)
 # Create Submission
 print('Best parameters: {}'.format(clf.best_params_))
 print('Best AUC: {}'.format(clf.best_score_))
-#  Best parameters: {'rf__max_features': 6, 'rf__n_estimators': 500, 'rf__max_depth': 8}
+# Best parameters: {'rf__max_features': 6, 'rf__n_estimators': 500, 'rf__max_depth': 8}
+# Best parameters: {'gb__n_estimators': 500, 'gb__max_depth': 3, 'gb__learning_rate': 0.1}
 
 submit = X_test[['SK_ID_CURR']]
 submit['TARGET'] = probabilities[:, 1]
 # submit.head()
-submit.to_csv('RF_07-01-2018.csv', index = False)
+submit.to_csv('GB_07-11-2018.csv', index = False)
 
 
 # Code to debug individual pipeline classes
